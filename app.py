@@ -4,7 +4,6 @@ import requests
 from datetime import datetime
 
 app = Flask(__name__)
-
 links = {}
 
 @app.route('/')
@@ -15,7 +14,6 @@ def home():
 def generate_link():
     original_url = request.json['url']
     tracking_id = str(uuid.uuid4())
-    # Gunakan host dari request
     tracking_link = request.host_url.rstrip('/') + f"/track/{tracking_id}"
     links[tracking_id] = original_url
     return jsonify({'tracking_link': tracking_link})
@@ -24,7 +22,6 @@ def generate_link():
 def track_link(tracking_id):
     original_url = links.get(tracking_id)
     if original_url:
-        # Deteksi IP dari header (untuk platform seperti Railway atau Replit)
         user_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
         try:
             location = requests.get(f'https://ipinfo.io/{user_ip}/json').json()
@@ -47,6 +44,5 @@ def track_link(tracking_id):
         return redirect(original_url)
     return "Link not found", 404
 
-# ✅ Penting untuk Railway: Jalankan app di 0.0.0.0:5000
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
